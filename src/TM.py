@@ -6,34 +6,34 @@ class TM:
     '''
         Tabulation Method
     '''
-    def __init__(self, variables_num, minterms) -> None:
-        self.variables_num = variables_num
-        self.minterms = minterms
+    def __init__(self, variables) -> None:
+        self.variables = variables
+        self.variables_num = len(variables)
     
-    def dec2bin(self):
+    def _dec2bin(self, dec: int):
         '''
-            將十進制的 minterm 轉換為二進制
+            將十進制轉換為二進制
         '''
-        minterms_bin = []
-        for i in self.minterms:
-            minterms_bin.append(bin(i)[2:].zfill(self.variables_num))
-        return minterms_bin
+        return format(dec, f'0{self.variables_num}b')
     
-    def group_by_one(self, variables_num, minterms, minterms_bin):
+    def group_by_one(self, terms):
         '''
-            將 minterm 依照 1 的數量分組
+            將 terms 依照 1 的數量分組
         '''
         one_groups = []
-        for i in range(variables_num + 1):
+        for i in range(self.variables_num + 1):
             one_groups.append([])
-        for i in range(len(minterms_bin)):
-            count = minterms_bin[i].count('1')
-            one_groups[count].append([str(minterms[i]), minterms_bin[i]])
+        for term in terms:
+            if term[0] == 'd' or term[0] == 'm' or term[0] == 'M':
+                term_dec = int(term[1:])
+                term_bin = self._dec2bin(term_dec)
+                count = term_bin.count('1')
+            one_groups[count].append([f'{term}', term_bin])
         return one_groups
     
     def _compare_01(self, a, b):
         '''
-            比較兩個 minterm 是否只差一個 1
+            比較兩個 term 是否只差一個 1
         '''
         count = 0
         for i in range(len(a)):
@@ -43,7 +43,7 @@ class TM:
     
     def _merge(self, a, b):
         '''
-            合併兩個 minterm
+            合併兩個 term
         '''
         result = ''
         for i in range(len(a)):
@@ -55,7 +55,7 @@ class TM:
 
     def _mark(self, row: list):
         '''
-            將比較過的 minterm mark 起來 (不重複標記)
+            將比較過的 term mark 起來 (不重複標記)
         '''
         if len(row) == 2:
             row.append('v')
@@ -63,7 +63,7 @@ class TM:
     
     def next_column(self, last_col: list):
         '''
-            依照 minterm 的 1 的數量進行合併
+            依照 term 的 1 的數量進行合併
         '''
         next_groups = []
         # 下一個 group 數量會比上一個少一個
@@ -72,10 +72,10 @@ class TM:
             for j in range(len(last_col[i])):
                 for k in range(len(last_col[i + 1])):
                     if self._compare_01(last_col[i][j][1], last_col[i + 1][k][1]):
-                        # 將比較過的 minterms mark 起來
+                        # 將比較過的 terms mark 起來
                         self._mark(last_col[i][j])
                         self._mark(last_col[i + 1][k])
-                        # 合併 minterms key
+                        # 合併 terms key
                         key = f'{last_col[i][j][0]}, {last_col[i + 1][k][0]}'
                         next_groups[i].append([key, self._merge(last_col[i][j][1], last_col[i + 1][k][1])])
         return last_col, next_groups
@@ -108,46 +108,46 @@ class TM:
         prime_implicants = self._filter_redundant(prime_implicants)
         return prime_implicants
     
-    def get_EPI(self, PIs, minterms):
+    def get_EPI(self, PIs, terms):
         '''
             取得 essential prime implicant
         '''
         EPIs = []
         NEPIs = []
-        minterm_in_PI = {}
+        term_in_PI = {}
         EPIs_mark = []
-        for i in minterms:
-            minterm_in_PI[str(i)] = 0
+        for i in terms:
+            term_in_PI[str(i)] = 0
         
-        # 計算每個 minterm 在 PI 中出現的次數
+        # 計算每個 term 在 PI 中出現的次數
         for PI in PIs:
-            minterms = PI[0].split(', ')
-            for minterm in minterms:
-                minterm_in_PI[minterm] += 1
+            terms = PI[0].split(', ')
+            for term in terms:
+                term_in_PI[term] += 1
         
         # 判斷是否為 EPI
-        for minterm in minterm_in_PI:
-            count = minterm_in_PI[minterm]
-            if count == 1:
-                EPIs_mark.append(minterm)
+        for term in term_in_PI:
+            count = term_in_PI[term]
+            if count == 1 and term[0] != 'd':
+                EPIs_mark.append(term)
                 for PI in PIs:
-                    minterms = PI[0].split(', ')
-                    if minterm in minterms and PI not in EPIs:
+                    terms = PI[0].split(', ')
+                    if term in terms and PI not in EPIs:
                         EPIs.append(PI)
                         
         # 取得 NEPI
-        # 將 EPI 的 minterm 從 minterm_in_PI 中移除
+        # 將 EPI 的 term 從 term_in_PI 中移除
         for EPI in EPIs:
-            EPIs_minterm = EPI[0].split(', ')
-            for minterm in EPIs_minterm:
-                minterm_in_PI[minterm] = 0
-        for minterm in minterm_in_PI:
+            EPIs_term = EPI[0].split(', ')
+            for term in EPIs_term:
+                term_in_PI[term] = 0
+        for term in term_in_PI:
             for PI in PIs:
-                if minterm_in_PI[minterm] != 0:
-                    minterms = PI[0].split(', ')
-                    if minterm in minterms:
+                if term_in_PI[term] != 0 and term[0] != 'd':
+                    terms = PI[0].split(', ')
+                    if term in terms:
                         NEPIs.append(PI)
-                        minterm_in_PI[minterm] = 0
+                        term_in_PI[term] = 0
         
         return EPIs, NEPIs, EPIs_mark
     
@@ -161,7 +161,7 @@ class TM:
             if i == 0:
                 table.field_names = ['Group', 'Decimal', 'Binary', '']
             else:
-                table.field_names = ['Group', 'Minterm', 'Binary', '']
+                table.field_names = ['Group', 'Terms', 'Binary', '']
             for j, group in enumerate(col):
                 for k, minterm in enumerate(group):
                     if k == 0:
@@ -178,23 +178,23 @@ class TM:
             print(f'Column {i}')
             print(table)
     
-    def gen_PI_chart(self, minterms, PIs, EPIs, NEPIs, EPIs_minterm):
+    def gen_PI_chart(self, terms, PIs, EPIs, NEPIs, EPIs_term):
         '''
             產生 Prime implicant chart ⛒ ✖
         '''
         PI_chart = pt.PrettyTable()
         field_names = ['', 'Prime Implicant']
-        for minterm in minterms:
-            field_names.append(f'm{minterm}')
+        for term in terms:
+            field_names.append(f'{term}')
         PI_chart.field_names = field_names
         for PI in PIs:
             PI_key = PI[0]
             row = ['', PI_key]
             PI_key = PI_key.split(', ')
-            for minterm in minterms:
-                minterm = str(minterm)
-                if minterm in PI_key:
-                    if minterm in EPIs_minterm:
+            for term in terms:
+                term = str(term)
+                if term in PI_key:
+                    if term in EPIs_term:
                         row.append('⛒')
                     else:
                         row.append('✖')
