@@ -1,8 +1,7 @@
-# BooleanAlgebraSimplifier
+# TMC
 
 ## 簡介
-這是一個基於 Tabulation Method 的布林代數簡化器，可以將輸入的布林代數表達式輸出成 POS 和 SOP。
-
+這是一個基於 Tabulation Method (Quine-McCluskey) 的布林函數簡化器。
 
 ## 使用方法
 
