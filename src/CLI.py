@@ -2,11 +2,6 @@ import argparse
 from TM import TM
 
 if __name__ == '__main__':
-    # example:
-    # python CLI.py -v a b c d -m 0 1 2 3 4 6 7 11 12 15
-    # python CLI.py -v a b c d -m 0 4 8 10 12 13 15 -d 1 2
-    # python CLI.py -v a b c d -M 1 3 5 7 13 15
-    # python CLI.py -v a b c d -M 0 8 10 12 13 15 -d 1 2 3
     parser = argparse.ArgumentParser(description='Boolean Algebra Simplifier use Tabulation Method by poyu39')
     parser.add_argument('-v', nargs='+', type=str, help='variables')
     parser.add_argument('-m', nargs='+', type=int, help='minterms')
