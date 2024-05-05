@@ -34,3 +34,16 @@ python CLI.py -v a b c d -M 0 8 10 12 13 15 -d 1 2 3
 
 ### GUI
 TODO
+
+## Screenshots
+
+### Column step
+![image](https://github.com/poyu39/BooleanAlgebraSimplifier/assets/42506064/93623943-619c-410c-88a1-cda2d6e79698)
+
+### Prime implicant chart
+![image](https://github.com/poyu39/BooleanAlgebraSimplifier/assets/42506064/768e5df8-6fad-4b4e-ae63-76d5f66b80c8)
+
+### logic function
+![image](https://github.com/poyu39/BooleanAlgebraSimplifier/assets/42506064/3b3ce00d-28c0-4dbb-873a-f8448bbb7081)
+
+
