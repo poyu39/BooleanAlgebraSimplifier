@@ -115,7 +115,7 @@ class TM:
         EPIs = []
         NEPIs = []
         minterm_in_PI = {}
-        EPIs_minterm = []
+        EPIs_mark = []
         for i in minterms:
             minterm_in_PI[str(i)] = 0
         
@@ -129,7 +129,7 @@ class TM:
         for minterm in minterm_in_PI:
             count = minterm_in_PI[minterm]
             if count == 1:
-                EPIs_minterm.append(minterm)
+                EPIs_mark.append(minterm)
                 for PI in PIs:
                     minterms = PI[0].split(', ')
                     if minterm in minterms and PI not in EPIs:
@@ -149,7 +149,7 @@ class TM:
                         NEPIs.append(PI)
                         minterm_in_PI[minterm] = 0
         
-        return EPIs, NEPIs, EPIs_minterm
+        return EPIs, NEPIs, EPIs_mark
     
     def gen_table(self, cols, PIs):
         '''
