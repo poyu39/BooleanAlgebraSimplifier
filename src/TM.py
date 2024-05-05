@@ -208,15 +208,20 @@ class TM:
             PI_chart.add_row(row)
         return PI_chart
     
-    def _bin2bool(self, variables, bin):
+    def _bin2bool(self, variables, bin, positive, negative, split_by = ''):
         result = ''
         index = 0
         for bit in bin:
-            if bit == '1':
+            if bit == positive:
                 result += f'{variables[index]}'
-            elif bit == '0':
+                result += f'{split_by}'
+            elif bit == negative:
                 result += f'{variables[index]}\''
+                result += f'{split_by}'
             index += 1
+        # 去除最後一個 split
+        result = result[:-len(split_by)]
+        result = f'({result})'
         return result
     
     def get_SOP(self, variables, EPIs, NEPIs):
@@ -225,7 +230,18 @@ class TM:
         '''
         result = []
         for EPI in EPIs:
-            result.append(self._bin2bool(variables, EPI[1]))
+            result.append(self._bin2bool(variables, EPI[1], '1', '0', ' '))
         for NEPI in NEPIs:
-            result.append(self._bin2bool(variables, NEPI[1]))
+            result.append(self._bin2bool(variables, NEPI[1], '1', '0', ' '))
         return ' + '.join(result)
+    
+    def get_POS(self, variables, EPIs, NEPIs):
+        '''
+            取得 POS logic function
+        '''
+        result = []
+        for EPI in EPIs:
+            result.append(self._bin2bool(variables, EPI[1], '0', '1', ' + '))
+        for NEPI in NEPIs:
+            result.append(self._bin2bool(variables, NEPI[1], '0', '1', ' + '))
+        return ' * '.join(result)
