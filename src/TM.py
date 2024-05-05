@@ -229,29 +229,3 @@ class TM:
         for NEPI in NEPIs:
             result.append(self._bin2bool(variables, NEPI[1]))
         return ' + '.join(result)
-
-if __name__ == '__main__':
-    variables = ['a', 'b', 'c', 'd']
-    minterms = [0, 1, 2, 3, 4, 6, 7, 11, 12, 15]
-    
-    tm = TM(len(variables), minterms)
-    minterms_bin = tm.dec2bin()
-    col1 = tm.group_by_one(len(variables), minterms, minterms_bin)
-    col1, col2 = tm.next_column(col1)
-    col2, col3 = tm.next_column(col2)
-    PIs = tm.get_PI([col1, col2, col3])
-    EPIs, NEPIs ,EPIs_minterm = tm.get_EPI(PIs, minterms)
-    
-    # table
-    tm.gen_table([col1, col2, col3], PIs)
-    
-    # PI_chart
-    PI_chart = tm.gen_PI_chart(minterms, PIs, EPIs, NEPIs, EPIs_minterm)
-    print('Prime implicant chart')
-    print(PI_chart)
-    
-    # boolean
-    print('SOP logic function')
-    SOP = tm.get_SOP(variables, EPIs, NEPIs)
-    function = f'f({", ".join(variables)}) = {SOP}'
-    print(function)
